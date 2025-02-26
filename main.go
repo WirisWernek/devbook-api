@@ -1,16 +1,19 @@
 package main
 
 import (
+	"devbook-api/src/config"
 	"devbook-api/src/router"
 	"fmt"
 	"net/http"
 )
 
 func main() {
+	config.Carregar()
+
 	router := router.Gerar()
 
-	fmt.Println("Rodando API")
+	fmt.Println("Escutando na porta %d", config.Porta)
 
-	http.ListenAndServe(":5000", router)
+	http.ListenAndServe(fmt.Sprintf(":%d", config.Porta), router)
 
 }
