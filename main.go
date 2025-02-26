@@ -12,7 +12,7 @@ func main() {
 
 	router := router.Gerar()
 
-	fmt.Println("Escutando na porta %d", config.Porta)
+	fmt.Println(fmt.Sprintf("Escutando na porta %d", config.Porta))
 
 	http.ListenAndServe(fmt.Sprintf(":%d", config.Porta), router)
 
