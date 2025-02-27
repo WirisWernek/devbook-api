@@ -9,7 +9,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // InsertUsuarios cadastra um usuario
@@ -82,7 +85,31 @@ func GetAllUsuarios(w http.ResponseWriter, r *http.Request) {
 
 // GetByIdUsuario Busca um usuário pelo se id
 func GetByIdUsuario(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Teste getById")
+	parametros := mux.Vars(r)
+	usuarioID, erro := strconv.ParseUint(parametros["usuarioID"], 10, 64)
+
+	if erro != nil {
+		response.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		response.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	defer db.Close()
+
+	repositorio := repository.NewRepositoryUsuarios(db)
+	usuario, erro := repositorio.GetByIdUsuario(usuarioID)
+
+	if erro != nil {
+		response.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	response.JSON(w, http.StatusOK, usuario)
 }
 
 // UpdateUsuario Atualiza os dados de um Usuario

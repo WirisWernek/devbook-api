@@ -67,3 +67,32 @@ func (repositorio UsuariosRepository) BuscarUsuarios(nomeOrNick string) ([]model
 	return usuarios, nil
 
 }
+
+// GetByIdUsuario retorna o usuário correspondente ao id informado
+func (repositorio UsuariosRepository) GetByIdUsuario(usuarioID uint64) (models.Usuario, error) {
+	statement, erro := repositorio.db.Prepare("SELECT u.id, u.nome, u.nick, u.email, criado_em FROM usuarios u WHERE u.id = $1")
+
+	if erro != nil {
+		return models.Usuario{}, erro
+	}
+
+	defer statement.Close()
+
+	linhas, erro := statement.Query(usuarioID)
+
+	if erro != nil {
+		return models.Usuario{}, erro
+	}
+
+	defer linhas.Close()
+
+	var usuario models.Usuario
+	if linhas.Next() {
+		if erro = linhas.Scan(&usuario.ID, &usuario.Nome, &usuario.Nick, &usuario.Email, &usuario.CriadoEm); erro != nil {
+			return models.Usuario{}, erro
+		}
+
+	}
+
+	return usuario, nil
+}
