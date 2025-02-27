@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // InsertUsuarios cadastra um usuario
@@ -49,6 +50,29 @@ func InsertUsuario(w http.ResponseWriter, r *http.Request) {
 
 	response.JSON(w, http.StatusCreated, usuario)
 
+}
+
+// GetAllUsuarios Busca todos os usuarios cadastrados
+func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
+	nomeOrNick := strings.ToLower(r.URL.Query().Get("usuario"))
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		response.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	defer db.Close()
+
+	repositorio := repository.NewRepositoryUsuarios(db)
+	usuarios, erro := repositorio.BuscarUsuarios(nomeOrNick)
+
+	if erro != nil {
+		response.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	response.JSON(w, http.StatusOK, usuarios)
 }
 
 // GetAllUsuarios Busca todos os usuarios cadastrados

@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"devbook-api/src/models"
+	"fmt"
 )
 
 // UsuariosRepository representa um repository de usuarios
@@ -33,4 +34,36 @@ func (repositorio UsuariosRepository) Insert(usuario models.Usuario) (uint64, er
 	}
 
 	return uint64(lastID), nil
+}
+
+// BuscarUsuarios busca os usuários com determinado nome ou nick
+func (repositorio UsuariosRepository) BuscarUsuarios(nomeOrNick string) ([]models.Usuario, error) {
+	nomeOrNick = fmt.Sprintf("%%%s%%", nomeOrNick)
+	statement, erro := repositorio.db.Prepare("SELECT u.id, u.nome, u.nick, u.email, criado_em FROM usuarios u WHERE u.nome like $1 or u.nick like $1")
+
+	if erro != nil {
+		return nil, erro
+	}
+
+	defer statement.Close()
+
+	linhas, erro := statement.Query(nomeOrNick)
+
+	if erro != nil {
+		return nil, erro
+	}
+
+	defer linhas.Close()
+
+	var usuarios []models.Usuario
+	for linhas.Next() {
+		var usuario models.Usuario
+		if erro = linhas.Scan(&usuario.ID, &usuario.Nome, &usuario.Nick, &usuario.Email, &usuario.CriadoEm); erro != nil {
+			return nil, erro
+		}
+		usuarios = append(usuarios, usuario)
+	}
+
+	return usuarios, nil
+
 }
