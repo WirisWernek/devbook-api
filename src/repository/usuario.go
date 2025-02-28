@@ -134,3 +134,32 @@ func (repositorio UsuariosRepository) DeleteUsuario(usuarioID uint64) error {
 
 	return nil
 }
+
+// GetByIdUsuario retorna o usuário correspondente ao id informado
+func (repositorio UsuariosRepository) GetByEmail(email string) (models.Usuario, error) {
+	statement, erro := repositorio.db.Prepare("SELECT u.id, u.senha FROM usuarios u WHERE u.email = $1")
+
+	if erro != nil {
+		return models.Usuario{}, erro
+	}
+
+	defer statement.Close()
+
+	linhas, erro := statement.Query(email)
+
+	if erro != nil {
+		return models.Usuario{}, erro
+	}
+
+	defer linhas.Close()
+
+	var usuario models.Usuario
+	if linhas.Next() {
+		if erro = linhas.Scan(&usuario.ID, &usuario.Senha); erro != nil {
+			return models.Usuario{}, erro
+		}
+
+	}
+
+	return usuario, nil
+}
