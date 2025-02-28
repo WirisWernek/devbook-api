@@ -15,6 +15,9 @@ var (
 
 	// Porta é a porta onde a API vai estar rodando
 	Porta = 0
+
+	// SecretKey é a chave que será utilizada como assinatura do token
+	SecretKey []byte
 )
 
 // Carregar vai inicializar as variáveis de ambiente
@@ -25,6 +28,7 @@ func Carregar() {
 	}
 
 	Porta, erro = strconv.Atoi(os.Getenv("API_PORTA"))
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 
 	if erro != nil {
 		Porta = 9000
