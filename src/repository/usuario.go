@@ -115,3 +115,22 @@ func (repositorio UsuariosRepository) UpdateUsuario(usuarioID uint64, usuario mo
 
 	return nil
 }
+
+// DeleteUsuario exclui um usuario do banco
+func (repositorio UsuariosRepository) DeleteUsuario(usuarioID uint64) error {
+	statement, erro := repositorio.db.Prepare("DELETE FROM usuarios WHERE id = $1")
+
+	if erro != nil {
+		return erro
+	}
+
+	defer statement.Close()
+
+	_, erro = statement.Exec(usuarioID)
+
+	if erro != nil {
+		return erro
+	}
+
+	return nil
+}

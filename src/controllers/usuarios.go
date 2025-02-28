@@ -161,5 +161,27 @@ func UpdateUsuario(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUsuario Exclui um usuario
 func DeleteUsuario(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Teste delete")
+	parametros := mux.Vars(r)
+	usuarioID, erro := strconv.ParseUint(parametros["usuarioID"], 10, 64)
+
+	if erro != nil {
+		response.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		response.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	defer db.Close()
+
+	repositorio := repository.NewRepositoryUsuarios(db)
+	if erro = repositorio.DeleteUsuario(usuarioID); erro != nil {
+		response.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	response.JSON(w, http.StatusNoContent, nil)
 }
