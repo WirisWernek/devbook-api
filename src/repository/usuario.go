@@ -96,3 +96,22 @@ func (repositorio UsuariosRepository) GetByIdUsuario(usuarioID uint64) (models.U
 
 	return usuario, nil
 }
+
+// UpdateUsuario atualiza um usuario no banco
+func (repositorio UsuariosRepository) UpdateUsuario(usuarioID uint64, usuario models.Usuario) error {
+	statement, erro := repositorio.db.Prepare("UPDATE usuarios SET nome = $2, nick = $3, email = $4 WHERE id = $1")
+
+	if erro != nil {
+		return erro
+	}
+
+	defer statement.Close()
+
+	_, erro = statement.Exec(usuarioID, usuario.Nome, usuario.Nick, usuario.Email)
+
+	if erro != nil {
+		return erro
+	}
+
+	return nil
+}
