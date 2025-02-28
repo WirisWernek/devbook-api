@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"devbook-api/src/auth"
 	"devbook-api/src/banco"
 	"devbook-api/src/models"
 	"devbook-api/src/repository"
@@ -47,5 +48,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.JSON(w, http.StatusOK, usuarioBanco)
+	token, _ := auth.GerarToken(usuarioBanco.ID)
+
+	response.JSON(w, http.StatusOK, token)
 }
