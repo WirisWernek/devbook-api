@@ -137,7 +137,7 @@ func UpdateUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if erro = usuario.Preparar("edicao"); erro != nil {
-		response.Erro(w, http.StatusInternalServerError, erro)
+		response.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
 
