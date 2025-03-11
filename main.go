@@ -4,6 +4,7 @@ import (
 	"devbook-api/src/config"
 	"devbook-api/src/router"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ func main() {
 
 	router := router.Gerar()
 
-	fmt.Println(fmt.Sprintf("Escutando na porta %d", config.Porta))
+	log.Printf("\tEscutando na porta %d", config.Porta)
 
 	http.ListenAndServe(fmt.Sprintf(":%d", config.Porta), router)
 

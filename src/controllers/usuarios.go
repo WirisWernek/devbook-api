@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"devbook-api/src/auth"
 	"devbook-api/src/banco"
 	"devbook-api/src/models"
 	"devbook-api/src/repository"
 	"devbook-api/src/response"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -122,6 +124,17 @@ func UpdateUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	usuarioLogadoID, erro := auth.ExtrairUsuarioID(r)
+	if erro != nil {
+		response.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	if usuarioID != usuarioLogadoID {
+		response.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
+		return
+	}
+
 	body, erro := io.ReadAll(r.Body)
 
 	if erro != nil {
@@ -166,6 +179,17 @@ func DeleteUsuario(w http.ResponseWriter, r *http.Request) {
 
 	if erro != nil {
 		response.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuarioLogadoID, erro := auth.ExtrairUsuarioID(r)
+	if erro != nil {
+		response.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	if usuarioID != usuarioLogadoID {
+		response.Erro(w, http.StatusForbidden, errors.New("Não é possível excluir um usuário que não seja o seu"))
 		return
 	}
 
